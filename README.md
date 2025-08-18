@@ -21,6 +21,32 @@ Below you will find extremely good optimizers, particularly for virtual machines
 
 Some of the commands are dangerous from a remote access perspective, but they will greatly optimize your VM.
 
+You can use the `optimize.sh` script to automatically setup most of the commands below.
+
+# OSX Optimization script
+
+**Make the script executable:**
+   ```bash
+chmod +x optimize.sh
+   ```
+
+**Run the script with root privileges:**
+   ```bash
+sudo sh optimize.sh
+```
+
+## How to Restore Auto-Login to Default (Disable Auto-Login)
+
+To remove auto-login and restore the login window's normal behavior, run the following commands:
+
+```bash
+sudo defaults delete /Library/Preferences/com.apple.loginwindow autoLoginUser
+sudo rm -f /etc/kcpassword
+```
+
+Reboot to apply the change.
+
+# Optimization commands 
 
 ## Skip the GUI login screen (at your own risk!)
 ```bash
