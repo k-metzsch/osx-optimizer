@@ -54,29 +54,10 @@ if [[ "$ENABLE_AUTOLOGIN" == "true" ]]; then
   done
 fi
 
-create_kcpassword() {
-  # Apple XOR obfuscation
-  local pass="$1"
-  local key=(0x7d 0x89 0x52 0x23 0xd2 0xbc 0xdd 0xf8)
-  pass+=$'\0'
-  local hexstream=""
-  for ((i = 0; i < ${#pass}; i++)); do
-    local c="${pass:i:1}"
-    local dec
-    dec=$(printf "%d" "'$c")
-    local k=${key[$((i % ${#key[@]}))]}
-    local xor=$((dec ^ k))
-    hexstream+="\\x$(printf "%02x" "$xor")"
-  done
-  printf '%b' "$hexstream" >/etc/kcpassword
-  chown root:wheel /etc/kcpassword
-  chmod 600 /etc/kcpassword
-}
-
 if [[ "$ENABLE_AUTOLOGIN" == "true" ]]; then
   echo "Enabling auto-login for user: $TARGET_USER"
-  defaults write /Library/Preferences/com.apple.loginwindow autoLoginUser -string "$TARGET_USER"
-  create_kcpassword "$AUTOLOGIN_PASS"
+  defaults write /Library/Preferences/com.apple.loginwindow autoLoginUser -string $TARGET_USER
+  sudo security add-generic-password -a $TARGET_USER -s com.apple.loginwindow.password -w $AUTOLOGIN_PASS /Library/Keychains/System.keychain
 else
   echo "Auto-login will NOT be enabled."
 fi
