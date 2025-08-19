@@ -17,6 +17,37 @@ if [[ $EUID -ne 0 ]]; then
   done 2>/dev/null &
 fi
 
+# Mount with mount_9p at starup from LaunchDaemons
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+MOUNT_SCRIPT_NAME="mount.sh"
+PLIST_NAME="com.macos.mount.plist"
+
+MOUNT_SCRIPT_SRC="${SCRIPT_DIR}/${MOUNT_SCRIPT_NAME}"
+PLIST_SRC="${SCRIPT_DIR}/${PLIST_NAME}"
+
+MOUNT_SCRIPT_DEST="/usr/local/bin/${MOUNT_SCRIPT_NAME}"
+PLIST_DEST="/Library/LaunchDaemons/${PLIST_NAME}"
+
+read -rp "Do you want to enable auto-mount of your 9P share on boot? [y/N]: " REPLY_AUTOMOUNT
+REPLY_AUTOMOUNT="${REPLY_AUTOMOUNT:-N}"
+
+if [[ "$REPLY_AUTOMOUNT" =~ ^[Yy] ]]; then
+  sudo cp "$MOUNT_SCRIPT_SRC" "$MOUNT_SCRIPT_DEST"
+  sudo chmod +x "$MOUNT_SCRIPT_DEST"
+
+  sudo cp "$PLIST_SRC" "$PLIST_DEST"
+  sudo chown root:wheel "$PLIST_DEST"
+  sudo chmod 644 "$PLIST_DEST"
+
+  sudo launchctl unload "$PLIST_DEST" 2>/dev/null || true
+
+  sudo launchctl load -w "$PLIST_DEST"
+
+  echo "Auto-mount is enabled."
+else
+  echo "Auto-mount setup skipped."
+fi
+
 read -rp "Enable auto-login? [y/N]: " REPLY_ENABLE
 REPLY_ENABLE="${REPLY_ENABLE:-N}"
 
@@ -121,6 +152,8 @@ defaults write com.apple.loginwindow TALLogoutSavesState -bool false
 echo "Configuring RemoteManagement"
 /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart \
   -activate -configure -access -off -restart -agent -privs -all -allowAccessFor -allUsers
+
+sudo dseditgroup -o edit -a $TARGET_USER -t user com.apple.access_ssh
 
 if [[ "$ENABLE_AUTOLOGIN" == "true" ]]; then
   echo "Disabling App Sleep globally for auto-login user..."
