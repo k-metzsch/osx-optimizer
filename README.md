@@ -25,11 +25,6 @@ You can use the `optimize.sh` script to automatically setup most of the commands
 
 # OSX Optimization script
 
-**Make the script executable:**
-   ```bash
-chmod +x optimize.sh
-   ```
-
 **Run the script with root privileges:**
    ```bash
 sudo sh optimize.sh

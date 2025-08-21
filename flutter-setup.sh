@@ -15,20 +15,33 @@ brew install temurin
 
 brew install android-commandlinetools
 
+# Package manager for iOS
+brew install cocoapods
+
+brew install robotsandpencils/made/xcodes
+
+# Dependencies for usbfluxd
+brew install make automake autoconf libtool pkg-config gcc libimobiledevice usbmuxd
+
 # Set ANDROID_HOME to brew installation
-if ! grep -q 'ANDROID_HOME' ~/.zshrc; then
+if ! grep -q 'ANDROID_HOME' ~/.zshenv; then
   {
     echo 'export _JAVA_OPTIONS="--enable-native-access=ALL-UNNAMED"'
     echo 'export ANDROID_HOME=/usr/local/share/android-commandlinetools'
     echo 'export ANDROID_SDK_ROOT=/usr/local/share/android-commandlinetools'
     echo 'export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools'
+    echo 'export PATH="/usr/local/bin:$PATH"'
   } >>~/.zshrc
-  echo "Android environment variables added to .zshrc"
 else
-  echo "Android environment variables already present in .zshrc"
+  echo "Android environment variables already present in .zshenv"
 fi
 
-source ~/.zshrc
+if ! grep -q '/usr/local/bin' ~/.zshenv; then
+else
+  echo "Flutter path already present in .zshenv"
+fi
+
+source ~/.zshenv
 
 sdkmanager --update
 
@@ -41,10 +54,6 @@ sdkmanager "$LATEST_BUILD_TOOLS"
 sdkmanager "$LATEST_PLATFORM"
 sdkmanager "$LATEST_SOURCES"
 
-brew install cocoapods
-
-brew install robotsandpencils/made/xcodes
-
 # Will prompt the user to login, follow instructions on screen
 xcodes install --latest
 
@@ -56,5 +65,12 @@ sudo xcodebuild -runFirstLaunch
 brew install --cask flutter
 
 yes | flutter doctor --android-licenses
+
+git clone https://github.com/corellium/usbfluxd.git
+cd usbfluxd
+
+./autogen.sh
+make
+sudo make install
 
 flutter doctor
