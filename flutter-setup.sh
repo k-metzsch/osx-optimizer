@@ -31,14 +31,10 @@ if ! grep -q 'ANDROID_HOME' ~/.zshenv; then
     echo 'export ANDROID_SDK_ROOT=/usr/local/share/android-commandlinetools'
     echo 'export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools'
     echo 'export PATH="/usr/local/bin:$PATH"'
+    echo 'export PATH="/usr/local/sbin:$PATH"'
   } >>~/.zshrc
 else
   echo "Android environment variables already present in .zshenv"
-fi
-
-if ! grep -q '/usr/local/bin' ~/.zshenv; then
-else
-  echo "Flutter path already present in .zshenv"
 fi
 
 source ~/.zshenv
@@ -66,11 +62,14 @@ brew install --cask flutter
 
 yes | flutter doctor --android-licenses
 
+# Mux USB devices to the container, from the host
 git clone https://github.com/corellium/usbfluxd.git
 cd usbfluxd
 
 ./autogen.sh
 make
 sudo make install
+
+sudo launchctl start usbmuxd
 
 flutter doctor

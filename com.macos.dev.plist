@@ -3,10 +3,10 @@
 <plist version="1.0">
 <dict>
   <key>Label</key>
-  <string>com.macos.mount</string>
+  <string>com.macos.dev</string>
   <key>ProgramArguments</key>
   <array>
-    <string>/usr/local/bin/mount.sh</string>
+    <string>/usr/local/bin/dev.sh</string>
   </array>
   <key>RunAtLoad</key>
   <true/>
